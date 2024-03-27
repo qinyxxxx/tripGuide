@@ -2,9 +2,17 @@ import React from "react";
 import * as ReactDOMClient from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import NotFound from "./components/NotFound";
-import Home from "./components/Home";
+import Login from "./components/Login";
 import { Auth0Provider } from "@auth0/auth0-react";
 import { AuthTokenProvider } from "./AuthTokenContext";
+import VerifyUser from "./components/VerifyUser";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./styles/index.css";
+import About from "./components/About";
+import Home from "./components/Home";
+import NewGuide from "./components/NewGuide";
+import AuthDebugger from "./components/AuthDebugger";
+
 
 const container = document.getElementById("root");
 const root = ReactDOMClient.createRoot(container);
@@ -25,8 +33,14 @@ root.render(
       <AuthTokenProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Login />} />
+            <Route path="/verify-user" element={<VerifyUser />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/create-guide" element={<NewGuide />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/debugger" element={<AuthDebugger />} />
             <Route path="*" element={<NotFound />} />
+            
           </Routes>
         </BrowserRouter>
       </AuthTokenProvider>

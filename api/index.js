@@ -1,7 +1,7 @@
 import * as dotenv from "dotenv";
 dotenv.config();
 import express from "express";
-import pkg from "@prisma/client";
+import pkg, { Prisma } from "@prisma/client";
 import morgan from "morgan";
 import cors from "cors";
 import { auth } from "express-oauth2-jwt-bearer";
@@ -29,6 +29,250 @@ app.get("/ping", (req, res) => {
 });
 
 // add your endpoints below this line
+
+app.post("/verify-user", requireAuth, async (req, res) => {
+  const auth0Id = req.auth.payload.sub;
+  const email = req.auth.payload[`${process.env.AUTH0_AUDIENCE}/email`];
+  const name = req.auth.payload[`${process.env.AUTH0_AUDIENCE}/name`];
+
+  const user = await prisma.user.findUnique({
+    where: {
+      auth0Id,
+    },
+  });
+
+  if (user) {
+    res.json(user);
+  } else {
+    const newUser = await prisma.user.create({
+      data: {
+        email,
+        auth0Id,
+        name,
+      },
+    });
+
+    res.json(newUser);
+  }
+});
+
+// ====================================== trip guide endpoint ==========================================
+// get all guides
+app.get("/tripguides", async (req, res) => {
+  const tripguides = await prisma.tripGuide.findMany({
+    where: {
+      isPublic: true,
+    },
+    include: {
+      comment: {
+        include: {
+          cuser: true, // Include the user related to each comment
+        },
+      },
+      user: true,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+
+  res.json(tripguides);
+});
+
+// get a triguide by id
+app.get("/tripguides/:id", async (req, res) => {
+  const tripGuide = await prisma.tripGuide.findUnique({
+    where: {
+      id: parseInt(req.params.id),
+    },
+    include: {
+      comment: true,
+      user: true
+    },
+  });
+  res.json(tripGuide);
+});
+
+// get my tripguides
+app.get("/my-tripguides", requireAuth, async (req, res) => {
+  const auth0Id = req.auth.payload.sub;
+  const user = await prisma.user.findUnique({
+    where: {
+      auth0Id,
+    },
+  });
+
+  const tripGuide = await prisma.tripGuide.findMany({
+    where: {
+      userId: user.id,
+    },
+  });
+  res.json(tripGuide);
+});
+
+// post a guide, need auth
+app.post("/tripguides", requireAuth, async (req, res) => {
+  const auth0Id = req.auth.payload.sub;
+  // todo validate data
+
+  const { title, isPublic, country, city, duration, rating, cost, content } = req.body;
+
+  const tripGuide = await prisma.tripGuide.create({
+    data: {
+      user: { connect: { auth0Id } },
+      title,
+      isPublic,
+      country,
+      city,
+      duration,
+      rating,
+      cost,
+      content,
+    }
+  });
+
+  res.json(tripGuide);
+});
+
+// update one of my guide, need auth
+app.put("/tripguides/:id", requireAuth, async (req, res) => {
+  const auth0Id = req.auth.payload.sub;
+  // todo validate data
+  // need to check if this post is mine
+
+  const id = req.params.id;
+  const user = await prisma.user.findUnique({
+    where: {
+      auth0Id,
+    },
+  });
+
+  const { title, isPublic, country, city, duration, rating, cost, content } = req.body;
+
+  const updateTripGuide = await prisma.tripGuide.update({
+    where: {
+      id: parseInt(id),
+      userId: user.id,
+    },
+    data: {
+      title,
+      isPublic,
+      country,
+      city,
+      duration,
+      rating,
+      cost,
+      content,
+    }
+  });
+
+  res.json(updateTripGuide);
+});
+
+// delete tripGuide with :id
+app.delete("/tripguides/:id", requireAuth, async (req, res) => {
+  const auth0Id = req.auth.payload.sub;
+  const user = await prisma.user.findUnique({
+    where: {
+      auth0Id,
+    },
+  });
+  const id = req.params.id;
+  const triguide = await prisma.tripGuide.delete({
+    where: {
+      id: parseInt(id),
+      userId: user.id,
+    }
+  });
+  res.json(triguide);
+});
+
+// ====================================== guide commtent endpoint ==========================================
+
+// get comments by trip guide id
+app.get("/tripguides/:id/comments", async (req, res) => {
+  const guideId = req.params.id;
+  const comments = await prisma.comment.findMany({
+    where: {
+      tripGuideId: parseInt(guideId),
+    },
+  });
+  res.json(comments);
+});
+
+// post a comment, need auth
+app.post("/tripguides/:id/comments", requireAuth, async (req, res) => {
+  const auth0Id = req.auth.payload.sub;
+  const guideId = req.params.id;
+  // todo validate data
+
+  const { content } = req.body;
+  const user = await prisma.user.findUnique({
+    where: {
+      auth0Id,
+    },
+  });
+
+  const comment = await prisma.comment.create({
+    data: {
+      cuserId: user.id,
+      tripGuideId: parseInt(guideId),
+      content,
+    }
+  });
+
+  res.json(comment);
+});
+
+// delete a comment, need auth
+app.delete("/tripguides/:tripGuideId/comments/:commentId", requireAuth, async (req, res) => {
+  const auth0Id = req.auth.payload.sub;
+  const guideId = req.params.tripGuideId;
+  const commentId = req.params.commentId;
+
+  const user = await prisma.user.findUnique({
+    where: {
+      auth0Id,
+    },
+  });
+
+  const deletedComment = await prisma.comment.delete({
+    where: {
+      id: parseInt(commentId),
+      tripGuideId: parseInt(guideId),
+      cuserId: user.id,
+    },
+  });
+  res.json(deletedComment);
+});
+
+// ====================================== guide commtent endpoint ==========================================
+
+app.get("/user", requireAuth, async (req, res) => {
+  const auth0Id = req.auth.payload.sub;
+
+  const user = await prisma.user.findUnique({
+    where: {
+      auth0Id,
+    },
+  });
+
+  res.json(user);
+});
+
+app.put("/user", requireAuth, async (req, res) => {
+  const auth0Id = req.auth.payload.sub;
+
+  const user = await prisma.user.findUnique({
+    where: {
+      auth0Id,
+    },
+  });
+
+
+  res.json(user);
+});
+
 
 app.listen(8000, () => {
   console.log("Server running on http://localhost:8000 🎉 🚀");
