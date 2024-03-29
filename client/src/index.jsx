@@ -10,7 +10,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./styles/index.css";
 import About from "./components/About";
 import Home from "./components/Home";
-import NewGuide from "./components/NewGuide";
+import GuideAction from "./components/GuideAction";
 import AuthDebugger from "./components/AuthDebugger";
 import GuideDetail from "./components/GuideDetail";
 import Profile from "./components/Profile";
@@ -39,8 +39,9 @@ root.render(
             <Route path="/verify-user" element={<VerifyUser />} />
             <Route path="/home" element={<Home />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/guide/:id" element={<GuideDetail />} />
-            <Route path="/create-guide" element={<NewGuide />} />
+            <Route path="/guide/detail/:id" element={<GuideDetail />} />
+            <Route path="/guide/create" element={<GuideAction action="create" />} />
+            <Route path="/guide/edit/:id" element={<GuideAction action="edit" />} />
             <Route path="/about" element={<About />} />
             <Route path="/debugger" element={<AuthDebugger />} />
             <Route path="*" element={<NotFound />} />

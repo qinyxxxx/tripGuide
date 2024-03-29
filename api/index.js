@@ -110,6 +110,17 @@ app.get("/my-tripguides", requireAuth, async (req, res) => {
     where: {
       guserId: user.id,
     },
+    include: {
+      comment: {
+        include: {
+          cuser: true,
+        },
+      },
+      guser: true
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
   });
   res.json(tripGuide);
 });
@@ -200,6 +211,9 @@ app.get("/tripguides/:id/comments", async (req, res) => {
     where: {
       tripGuideId: parseInt(guideId),
     },
+    include: {
+      cuser: true,
+    }
   });
   res.json(comments);
 });
@@ -222,7 +236,10 @@ app.post("/tripguides/:id/comments", requireAuth, async (req, res) => {
       cuserId: user.id,
       tripGuideId: parseInt(guideId),
       content,
-    }
+    },
+    include: {
+      cuser: true,
+    },
   });
 
   res.json(comment);

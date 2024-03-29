@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import Header from "./Header";
 import { Link } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
 import useTripGuides from "../hooks/useTripGuides";
+import DeleteModal from "./DeleteModal";
 
 const Home = () => {
-    const { tripGuides } = useTripGuides();
-    console.log(tripGuides);
+    const { tripGuides, deleteTripGuide } = useTripGuides();
+    const { user } = useAuth0();
 
     const formattedDate = (dateString) => {
         const date = new Date(dateString);
@@ -24,12 +26,32 @@ const Home = () => {
         return content;
     };
 
+    const [deleteModalShow, setDeleteModalShow] = useState(false);
+    const [guideToDelete, setGuideToDelete] = useState(null);
+    const handleDeleteClick = (guide) => {
+        setGuideToDelete(guide);
+        setDeleteModalShow(true);
+    };
+
+    const handleDeleteModalHide = () => {
+        setDeleteModalShow(false);
+    };
+
+    const handleDelete = async () => {
+        try {
+          await deleteTripGuide(guideToDelete.id);
+          handleDeleteModalHide();
+        } catch (error) {
+          console.error(error);
+        }
+    };
+
     return (
         <div>
             <Header className="fixed-top" />
             <div className="container mt-4">
                 <div className="text-center">
-                    <Link to="/create-guide" className="btn btn-primary">
+                    <Link to="/guide/create" className="btn btn-primary">
                         Create New Guide
                     </Link>
                     <Link to="/debugger" className="btn btn-primary">
@@ -43,6 +65,18 @@ const Home = () => {
                         <div key={guide.id} className="col">
                             <div className="card h-100">
                                 <div className="card-body">
+                                    {user && (user.sub === guide.guser.auth0Id) && (
+                                        <>
+                                            <Link to={`/guide/edit/${guide.id}`} className="btn btn-primary btn-sm float-end">
+                                                Edit
+                                            </Link>
+                                            <button type="button" className="btn btn-primary btn-sm float-end me-2"
+                                                onClick={() => handleDeleteClick(guide)}>
+                                                delete<i className="bi bi-trash"></i>
+                                            </button>
+                                        </>
+                                    )}
+
                                     <h5 className="card-title text-center mb-3">{guide.title}</h5>
                                     <p className="card-text">
                                         <strong>Country:</strong> {guide.country}
@@ -64,7 +98,7 @@ const Home = () => {
                                         <small className="text-muted">
                                             Posted by {guide.guser.name} on {" "} {formattedDate(guide.createdAt)}
                                         </small>
-                                        <Link to={`/guide/${guide.id}`} className="btn btn-primary">
+                                        <Link to={`/guide/detail/${guide.id}`} className="btn btn-primary">
                                             View Details
                                         </Link>
                                     </div>
@@ -87,13 +121,23 @@ const Home = () => {
                                             ))}
                                         </ul>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
+                                </div >
+                            </div >
+                        </div >
                     ))}
-                </div>
-            </div>
-        </div>
+                </div >
+            </div >
+            {deleteModalShow &&
+                guideToDelete &&
+                (
+                    <DeleteModal
+                        show={deleteModalShow}
+                        onHide={handleDeleteModalHide}
+                        onDelete={handleDelete}
+                        content={`Are you sure you want to delete ${guideToDelete.title}?`}
+                    />
+                )}
+        </div >
     );
 };
 

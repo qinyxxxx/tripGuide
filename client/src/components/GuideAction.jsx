@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "./Header";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import useTripGuides from "../hooks/useTripGuides";
 
-const NewGuide = () => {
-  const { createTripGuide } = useTripGuides();
+const GuideAction = () => {
+  const { id } = useParams();
+  const { useSingleGuide, createTripGuide, updateTripGuide } = useTripGuides();
   const navigate = useNavigate();
+  const location = useLocation();
+  const action = location.pathname.split("/")[2];
 
   const [formData, setFormData] = useState({
     title: "",
@@ -17,6 +20,22 @@ const NewGuide = () => {
     content: ""
   });
 
+  const singleGuide = useSingleGuide(id);
+
+  useEffect(() => {
+    if (singleGuide && action === 'edit') {
+      setFormData({
+        title: singleGuide.title,
+        country: singleGuide.country,
+        city: singleGuide.city,
+        duration: singleGuide.duration,
+        rating: singleGuide.rating,
+        cost: singleGuide.cost,
+        content: singleGuide.content
+      });
+    }
+  }, [singleGuide, action]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
@@ -24,9 +43,8 @@ const NewGuide = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
 
-    const handleCreate = async () => {
+    const handleAction = async () => {
       try {
         const newGuide = {
           title: formData.title,
@@ -37,26 +55,14 @@ const NewGuide = () => {
           cost: parseFloat(formData.cost),
           content: formData.content
         }
-        const res = await createTripGuide(newGuide);
-        console.log("created");
-        
-        navigate(`/guide/${res.id}`);
-        // Reset form fields after submission
-        setFormData({
-          title: "",
-          country: "",
-          city: "",
-          duration: "",
-          rating: "",
-          cost: "",
-          content: ""
-        });
+        const res = action === 'edit' ? await updateTripGuide(id, newGuide) : await createTripGuide(newGuide);
+
+        navigate(`/guide/detail/${res.id}`);
       } catch (error) {
         console.log(error);
       }
     };
-
-    handleCreate();
+    handleAction();
   };
 
   const handleRatingChange = (e) => {
@@ -71,7 +77,15 @@ const NewGuide = () => {
           <div className="col-md-8">
             <div className="card shadow">
               <div className="card-body">
-                <h3 className="card-title text-center mb-4">Create New Post</h3>
+                {/* <button className="btn btn-link" onClick={navigate(-1)} style={{ position: 'absolute', top: '10px', left: '10px' }}>
+                  Back
+                </button> */}
+
+                {action === "create" ? (
+                  <h3 className="card-title text-center mb-4">Create New Post</h3>
+                ) : (
+                  <h3 className="card-title text-center mb-4">Edit Post</h3>
+                )}
                 <form onSubmit={handleSubmit}>
                   <div className="mb-3">
                     <label htmlFor="title" className="form-label">Title</label>
@@ -165,7 +179,7 @@ const NewGuide = () => {
                   </div>
                   <div className="text-center">
                     <button type="submit" className="btn btn-primary">Submit</button>
-                    <Link to="/" className="btn btn-link ms-2">Cancel</Link>
+                    {/* <Link to="/" className="btn btn-link ms-2">Cancel</Link> */}
                   </div>
                 </form>
               </div>
@@ -177,4 +191,4 @@ const NewGuide = () => {
   );
 };
 
-export default NewGuide;
+export default GuideAction;

@@ -1,17 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import Header from "./Header";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Link, useParams } from "react-router-dom";
 import useTripGuides from "../hooks/useTripGuides";
+import useComments from "../hooks/useComments";
 
 const GuideDetail = () => {
   const { user } = useAuth0();
   const { id } = useParams();
   const { useSingleGuide } = useTripGuides();
   const guide = useSingleGuide(id);
-  console.log(user);
+  const { comments, createComment } = useComments(id);
+  const [newCommentContent, setNewCommentContent] = useState("");
 
-  if (!guide || !user) {
+  if (!guide || !user) { // todo bug
     return <div>Loading...</div>;
   }
 
@@ -25,6 +27,19 @@ const GuideDetail = () => {
     return `${year}/${month}/${day} ${hours}:${minutes}`;
   };
 
+  const handleSubmitComment = async (e) => {
+    e.preventDefault();
+    if (!newCommentContent.trim()) {
+      return;
+    }
+    try {
+      await createComment({ content: newCommentContent });
+      setNewCommentContent("");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div>
       <Header />
@@ -32,7 +47,7 @@ const GuideDetail = () => {
         <div className="card">
           <div className="card-body">
             {user.sub === guide.guser.auth0Id && (
-              <Link to={`/edit-guide/${id}`} className="btn btn-primary btn-sm float-end">
+              <Link to={`/guide/edit/${id}`} className="btn btn-primary btn-sm float-end">
                 Edit
               </Link>
             )}
@@ -60,9 +75,9 @@ const GuideDetail = () => {
             </div>
             <hr />
             <div>
-              <h6>Comments({guide.comment.length}):</h6>
+              <h6>Comments({comments.length}):</h6>
               <ul>
-                {guide.comment.map((comment) => (
+                {comments.map((comment) => (
                   <li key={comment.id}>
                     <div>{comment.content}</div>
                     <div className="text-end">
@@ -75,6 +90,25 @@ const GuideDetail = () => {
                 ))}
               </ul>
             </div>
+            {/* <hr /> */}
+            {user && (
+              <div>
+                <form onSubmit={handleSubmitComment}>
+                  <div className="mb-3">
+                    <textarea
+                      className="form-control"
+                      rows="3"
+                      placeholder="Enter your comment"
+                      value={newCommentContent}
+                      onChange={e => setNewCommentContent(e.target.value)}
+                    ></textarea>
+                  </div>
+                  <button type="submit" className="btn btn-primary">
+                    Submit
+                  </button>
+                </form>
+              </div>
+            )}
           </div>
         </div>
       </div>
