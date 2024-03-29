@@ -69,7 +69,7 @@ app.get("/tripguides", async (req, res) => {
           cuser: true, // Include the user related to each comment
         },
       },
-      user: true,
+      guser: true,
     },
     orderBy: {
       createdAt: 'desc',
@@ -86,8 +86,12 @@ app.get("/tripguides/:id", async (req, res) => {
       id: parseInt(req.params.id),
     },
     include: {
-      comment: true,
-      user: true
+      comment: {
+        include: {
+          cuser: true, // Include the user related to each comment
+        },
+      },
+      guser: true
     },
   });
   res.json(tripGuide);
@@ -104,7 +108,7 @@ app.get("/my-tripguides", requireAuth, async (req, res) => {
 
   const tripGuide = await prisma.tripGuide.findMany({
     where: {
-      userId: user.id,
+      guserId: user.id,
     },
   });
   res.json(tripGuide);
@@ -119,7 +123,7 @@ app.post("/tripguides", requireAuth, async (req, res) => {
 
   const tripGuide = await prisma.tripGuide.create({
     data: {
-      user: { connect: { auth0Id } },
+      guser: { connect: { auth0Id } },
       title,
       isPublic,
       country,
@@ -152,7 +156,7 @@ app.put("/tripguides/:id", requireAuth, async (req, res) => {
   const updateTripGuide = await prisma.tripGuide.update({
     where: {
       id: parseInt(id),
-      userId: user.id,
+      guserId: user.id,
     },
     data: {
       title,
@@ -181,7 +185,7 @@ app.delete("/tripguides/:id", requireAuth, async (req, res) => {
   const triguide = await prisma.tripGuide.delete({
     where: {
       id: parseInt(id),
-      userId: user.id,
+      guserId: user.id,
     }
   });
   res.json(triguide);
@@ -246,7 +250,7 @@ app.delete("/tripguides/:tripGuideId/comments/:commentId", requireAuth, async (r
   res.json(deletedComment);
 });
 
-// ====================================== guide commtent endpoint ==========================================
+// ====================================== user endpoint ==========================================
 
 app.get("/user", requireAuth, async (req, res) => {
   const auth0Id = req.auth.payload.sub;
@@ -263,14 +267,19 @@ app.get("/user", requireAuth, async (req, res) => {
 app.put("/user", requireAuth, async (req, res) => {
   const auth0Id = req.auth.payload.sub;
 
-  const user = await prisma.user.findUnique({
+  const { gender, birthDate, introduction } = req.body;
+  const updateUser = await prisma.user.update({
     where: {
-      auth0Id,
+      auth0Id: auth0Id
     },
+    data: {
+      gender,
+      birthDate,
+      introduction,
+    }
   });
 
-
-  res.json(user);
+  res.json(updateUser);
 });
 
 

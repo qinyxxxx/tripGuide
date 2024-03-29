@@ -19,7 +19,7 @@ model User {
   auth0Id      String      @unique @default("")
   name         String?
   birthDate    String?
-  sex          String?
+  gender       String?
   introduction String?     @db.VarChar(255)
   tipGuide     TripGuide[]
   comment      Comment[]
@@ -29,15 +29,15 @@ model TripGuide {
   id        Int       @id @default(autoincrement())
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  user      User      @relation(fields: [userId], references: [id])
-  userId    Int
+  guser      User      @relation(fields: [guserId], references: [id])
+  guserId    Int
   title     String    @db.VarChar(255)
   isPublic  Boolean   @default(true)
   country   String    @db.VarChar(255)
   city      String?   @db.VarChar(255)
   duration  Int       @db.Int
   rating    Int       @db.Int
-  cost      Int?      @default(-1)
+  cost      Float?      @default(-1)
   content   String    @db.Text
   comment   Comment[]
 }
@@ -46,8 +46,8 @@ model Comment {
   id          Int       @id @default(autoincrement())
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  cuser        User      @relation(fields: [cuserId], references: [id])
-  cuserId      Int
+  cuser       User      @relation(fields: [cuserId], references: [id])
+  cuserId     Int
   tripGuide   TripGuide @relation(fields: [tripGuideId], references: [id])
   tripGuideId Int
   content     String    @db.Text

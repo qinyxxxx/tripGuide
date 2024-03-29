@@ -12,6 +12,8 @@ import About from "./components/About";
 import Home from "./components/Home";
 import NewGuide from "./components/NewGuide";
 import AuthDebugger from "./components/AuthDebugger";
+import GuideDetail from "./components/GuideDetail";
+import Profile from "./components/Profile";
 
 
 const container = document.getElementById("root");
@@ -36,6 +38,8 @@ root.render(
             <Route path="/" element={<Login />} />
             <Route path="/verify-user" element={<VerifyUser />} />
             <Route path="/home" element={<Home />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/guide/:id" element={<GuideDetail />} />
             <Route path="/create-guide" element={<NewGuide />} />
             <Route path="/about" element={<About />} />
             <Route path="/debugger" element={<AuthDebugger />} />

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import useTripGuides from "../hooks/useTripGuides";
 
 const Home = () => {
-    const tripGuides = useTripGuides();
+    const { tripGuides } = useTripGuides();
     console.log(tripGuides);
 
     const formattedDate = (dateString) => {
@@ -26,7 +26,7 @@ const Home = () => {
 
     return (
         <div>
-            <Header />
+            <Header className="fixed-top" />
             <div className="container mt-4">
                 <div className="text-center">
                     <Link to="/create-guide" className="btn btn-primary">
@@ -62,9 +62,11 @@ const Home = () => {
                                     </p>
                                     <div className="d-flex justify-content-between align-items-center">
                                         <small className="text-muted">
-                                            Posted by {guide.user.name} on {" "} {formattedDate(guide.createdAt)}
+                                            Posted by {guide.guser.name} on {" "} {formattedDate(guide.createdAt)}
                                         </small>
-                                        <button className="btn btn-primary">View Details</button>
+                                        <Link to={`/guide/${guide.id}`} className="btn btn-primary">
+                                            View Details
+                                        </Link>
                                     </div>
                                     <hr />
                                     <div>
