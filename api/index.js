@@ -61,7 +61,7 @@ app.post("/verify-user", requireAuth, async (req, res) => {
 app.get("/tripguides", async (req, res) => {
   const tripguides = await prisma.tripGuide.findMany({
     where: {
-      isPublic: true,
+      isPrivate: false,
     },
     include: {
       comment: {
@@ -130,13 +130,13 @@ app.post("/tripguides", requireAuth, async (req, res) => {
   const auth0Id = req.auth.payload.sub;
   // todo validate data
 
-  const { title, isPublic, country, city, duration, rating, cost, content } = req.body;
+  const { title, isPrivate, country, city, duration, rating, cost, content } = req.body;
 
   const tripGuide = await prisma.tripGuide.create({
     data: {
       guser: { connect: { auth0Id } },
       title,
-      isPublic,
+      isPrivate,
       country,
       city,
       duration,
@@ -162,7 +162,7 @@ app.put("/tripguides/:id", requireAuth, async (req, res) => {
     },
   });
 
-  const { title, isPublic, country, city, duration, rating, cost, content } = req.body;
+  const { title, isPrivate, country, city, duration, rating, cost, content } = req.body;
 
   const updateTripGuide = await prisma.tripGuide.update({
     where: {
@@ -171,7 +171,7 @@ app.put("/tripguides/:id", requireAuth, async (req, res) => {
     },
     data: {
       title,
-      isPublic,
+      isPrivate,
       country,
       city,
       duration,

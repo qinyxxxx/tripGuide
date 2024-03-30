@@ -1,30 +1,38 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "./Header";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import useTripGuides from "../hooks/useTripGuides";
 import DeleteModal from "./DeleteModal";
 
-const Home = () => {
-  const { tripGuides, deleteTripGuide } = useTripGuides();
-  const { user } = useAuth0();
 
-  const formattedDate = (dateString) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Month is zero-indexed
-    const day = String(date.getDate()).padStart(2, "0");
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    return `${year}/${month}/${day} ${hours}:${minutes}`;
-  };
+const formattedDate = (dateString) => {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Month is zero-indexed
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${year}/${month}/${day} ${hours}:${minutes}`;
+};
 
-  const truncateContent = (content, maxLength) => {
-    if (content.length > maxLength) {
-      return content.substring(0, maxLength) + "...";
+const truncateContent = (content, maxLength) => {
+  if (content.length > maxLength) {
+    return content.substring(0, maxLength) + "...";
+  }
+  return content;
+};
+
+const MyTripGuides = () => {
+  const { myGuides, deleteTripGuide } = useTripGuides();
+  const { user, isAuthenticated, isLoading } = useAuth0();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      navigate('/login');
     }
-    return content;
-  };
+  }, [isLoading, isAuthenticated, navigate]);
 
   const [deleteModalShow, setDeleteModalShow] = useState(false);
   const [guideToDelete, setGuideToDelete] = useState(null);
@@ -46,6 +54,15 @@ const Home = () => {
     }
   };
 
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  // Redirect to login if not authenticated
+  if (!isAuthenticated) {
+    return null;
+  }
+
   return (
     <div>
       <Header className="fixed-top" />
@@ -54,26 +71,24 @@ const Home = () => {
           <Link to="/guide/create" className="btn btn-primary">
             Create New Guide
           </Link>
-          <Link to="/debugger" className="btn btn-primary">
-            Debugger
-          </Link>
         </div>
       </div>
       <div className="container mt-4">
         <div className="row row-cols-1 row-cols-md-2 g-4">
-          {tripGuides.map((guide) => (
+          {myGuides.map((guide) => (
             <div key={guide.id} className="col">
               <div className="card h-100">
                 <div className="card-body">
                   {user && (user.sub === guide.guser.auth0Id) && (
                     <>
-                      <Link to={`/guide/edit/${guide.id}`} className="btn btn-sm float-end">
-                        <i className="bi bi-pencil"></i>
-                      </Link>
                       <button type="button" className="btn btn-sm float-end me-2"
                         onClick={() => handleDeleteClick(guide)}>
                         <i className="bi bi-trash"></i>
                       </button>
+                      <Link to={`/guide/edit/${guide.id}`} className="btn btn-sm float-end">
+                        <i className="bi bi-pencil"></i>
+                      </Link>
+
                     </>
                   )}
 
@@ -141,4 +156,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default MyTripGuides;

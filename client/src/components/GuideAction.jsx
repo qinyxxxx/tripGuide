@@ -1,12 +1,23 @@
 import React, { useState, useEffect } from "react";
 import Header from "./Header";
-import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import useTripGuides from "../hooks/useTripGuides";
+import useCountryCity from "../hooks/useCountryCity";
+import { useAuth0 } from "@auth0/auth0-react";
+
 
 const GuideAction = () => {
+  const { user } = useAuth0();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    }
+  }, [navigate, user]);
+
   const { id } = useParams();
   const { useSingleGuide, createTripGuide, updateTripGuide } = useTripGuides();
-  const navigate = useNavigate();
   const location = useLocation();
   const action = location.pathname.split("/")[2];
 
@@ -17,7 +28,8 @@ const GuideAction = () => {
     duration: "",
     rating: "",
     cost: "",
-    content: ""
+    content: "",
+    isPrivate: true,
   });
 
   const singleGuide = useSingleGuide(id);
@@ -31,14 +43,21 @@ const GuideAction = () => {
         duration: singleGuide.duration,
         rating: singleGuide.rating,
         cost: singleGuide.cost,
-        content: singleGuide.content
+        content: singleGuide.content,
+        isPrivate: singleGuide.isPrivate,
       });
     }
   }, [singleGuide, action]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+    const { name, value, checked } = e.target;
+    if (name === 'isPrivate') {
+      setFormData((prevFormData) => ({ ...prevFormData, isPrivate: checked }));
+    } else if (name === 'rating') {
+      setFormData((prevFormData) => ({ ...prevFormData, rating: e.target.value }));
+    } else {
+      setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+    }
   };
 
   const handleSubmit = (e) => {
@@ -53,7 +72,8 @@ const GuideAction = () => {
           duration: parseInt(formData.duration),
           rating: parseInt(formData.rating),
           cost: parseFloat(formData.cost),
-          content: formData.content
+          content: formData.content,
+          isPrivate: formData.isPrivate
         }
         const res = action === 'edit' ? await updateTripGuide(id, newGuide) : await createTripGuide(newGuide);
 
@@ -65,9 +85,17 @@ const GuideAction = () => {
     handleAction();
   };
 
-  const handleRatingChange = (e) => {
-    setFormData((prevFormData) => ({ ...prevFormData, rating: e.target.value }));
+  const { countries, getCities } = useCountryCity();
+
+  const [cities, setCities] = useState([]);
+  const handleCountryChange = (e) => {
+    const countryIso = e.target.value;
+    setFormData((prevFormData) => ({ ...prevFormData, country: countryIso }));
+    getCities(countryIso).then((citiesData) => {
+      setCities(citiesData);
+    });
   };
+
 
   return (
     <div>
@@ -77,14 +105,11 @@ const GuideAction = () => {
           <div className="col-md-8">
             <div className="card shadow">
               <div className="card-body">
-                {/* <button className="btn btn-link" onClick={navigate(-1)} style={{ position: 'absolute', top: '10px', left: '10px' }}>
-                  Back
-                </button> */}
-
+                <button onClick={() => window.history.back()} className="btn float-start"><i className="bi bi-backspace-fill"></i></button>
                 {action === "create" ? (
                   <h3 className="card-title text-center mb-4">Create New Post</h3>
                 ) : (
-                  <h3 className="card-title text-center mb-4">Edit Post</h3>
+                  <h3 className="card-title text-center mb-4">Edit My Post</h3>
                 )}
                 <form onSubmit={handleSubmit}>
                   <div className="mb-3">
@@ -102,15 +127,21 @@ const GuideAction = () => {
                   <div className="row mb-3">
                     <div className="col">
                       <label htmlFor="country" className="form-label">Country</label>
-                      <input
-                        type="text"
+                      <select
                         className="form-control"
                         id="country"
                         name="country"
                         value={formData.country}
-                        onChange={handleChange}
+                        onChange={handleCountryChange}
                         required
-                      />
+                      >
+                        <option value="">Select a country</option>
+                        {countries.map(country => (
+                          <option key={country.Iso2} value={country.name}>
+                            {country.name}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div className="col">
                       <label htmlFor="city" className="form-label">City</label>
@@ -121,8 +152,22 @@ const GuideAction = () => {
                         name="city"
                         value={formData.city}
                         onChange={handleChange}
-                        required
                       />
+                      {/* <select
+                        className="form-control"
+                        id="city"
+                        name="city"
+                        value={formData.city}
+                        onChange={(e) => setFormData((prevFormData) => ({ ...prevFormData, city: e.target.value }))}
+                        required
+                      >
+                        <option value="">Select a city</option>
+                        {cities.map(city => (
+                          <option key={city.name} value={city.name}>
+                            {city.name}
+                          </option>
+                        ))}
+                      </select> */}
                     </div>
                   </div>
                   <div className="row mb-3">
@@ -144,7 +189,7 @@ const GuideAction = () => {
                         id="rating"
                         name="rating"
                         value={formData.rating}
-                        onChange={handleRatingChange}
+                        onChange={handleChange}
                         required
                       >
                         <option value="">Select Rating</option>
@@ -177,9 +222,22 @@ const GuideAction = () => {
                       required
                     ></textarea>
                   </div>
+                  <div className="mb-3 form-check">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="isPrivate"
+                      name="isPrivate"
+                      checked={formData.isPrivate}
+                      onChange={handleChange}
+                    />
+                    <label className="form-check-label" htmlFor="isPrivate">
+                      Make this post private
+                    </label>
+                  </div>
                   <div className="text-center">
                     <button type="submit" className="btn btn-primary">Submit</button>
-                    {/* <Link to="/" className="btn btn-link ms-2">Cancel</Link> */}
+
                   </div>
                 </form>
               </div>

@@ -7,6 +7,7 @@ import { Auth0Provider } from "@auth0/auth0-react";
 import { AuthTokenProvider } from "./AuthTokenContext";
 import VerifyUser from "./components/VerifyUser";
 import "bootstrap/dist/css/bootstrap.min.css";
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import "./styles/index.css";
 import About from "./components/About";
 import Home from "./components/Home";
@@ -14,6 +15,7 @@ import GuideAction from "./components/GuideAction";
 import AuthDebugger from "./components/AuthDebugger";
 import GuideDetail from "./components/GuideDetail";
 import Profile from "./components/Profile";
+import MyTripGuide from "./components/MyTripGuides"
 
 
 const container = document.getElementById("root");
@@ -35,17 +37,18 @@ root.render(
       <AuthTokenProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Login />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/verify-user" element={<VerifyUser />} />
-            <Route path="/home" element={<Home />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/my-tripguides" element={<MyTripGuide />} />
             <Route path="/guide/detail/:id" element={<GuideDetail />} />
             <Route path="/guide/create" element={<GuideAction action="create" />} />
             <Route path="/guide/edit/:id" element={<GuideAction action="edit" />} />
             <Route path="/about" element={<About />} />
             <Route path="/debugger" element={<AuthDebugger />} />
             <Route path="*" element={<NotFound />} />
-            
+
           </Routes>
         </BrowserRouter>
       </AuthTokenProvider>

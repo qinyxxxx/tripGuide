@@ -32,7 +32,7 @@ model TripGuide {
   guser      User      @relation(fields: [guserId], references: [id])
   guserId    Int
   title     String    @db.VarChar(255)
-  isPublic  Boolean   @default(true)
+  isPrivate  Boolean   @default(false)
   country   String    @db.VarChar(255)
   city      String?   @db.VarChar(255)
   duration  Int       @db.Int

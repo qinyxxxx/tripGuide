@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import Header from "./Header";
 import useUser from "../hooks/useUser";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
+  const navigate = useNavigate();
   const [user, updateUserProfile] = useUser();
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
@@ -18,8 +20,10 @@ const Profile = () => {
         birthDate: user.birthDate || '',
         introduction: user.introduction || ''
       });
+    } else {
+      navigate('/login');
     }
-  }, [user, setFormData]);
+  }, [user, setFormData, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

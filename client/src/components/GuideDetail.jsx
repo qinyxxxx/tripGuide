@@ -13,7 +13,7 @@ const GuideDetail = () => {
   const { comments, createComment } = useComments(id);
   const [newCommentContent, setNewCommentContent] = useState("");
 
-  if (!guide || !user) { // todo bug
+  if (!guide) { // todo bug
     return <div>Loading...</div>;
   }
 
@@ -46,13 +46,13 @@ const GuideDetail = () => {
       <div className="container mt-4">
         <div className="card">
           <div className="card-body">
-            {user.sub === guide.guser.auth0Id && (
-              <Link to={`/guide/edit/${id}`} className="btn btn-primary btn-sm float-end">
+            {user && user.sub === guide.guser.auth0Id && (
+              <Link to={`/guide/edit/${id}`} className="btn btn-primary float-end">
                 Edit
               </Link>
             )}
+            {guide.isPrivate ? (<i className="bi bi-lock-fill fs-5"></i>) : (<i className="bi bi-unlock fs-5"></i>)} 
             <h2 className="card-title text-center">{guide.title}</h2>
-
             <p className="card-text">
               <strong>Country:</strong> {guide.country}
             </p>
@@ -68,7 +68,7 @@ const GuideDetail = () => {
             <p className="card-text">
               <strong>Rating:</strong> {guide.rating}
             </p>
-            <div className="d-flex">
+            <div className="d-flex justify-content-end">
               <small>
                 Posted by {guide.guser.name} on {formattedDate(guide.createdAt)}
               </small>
@@ -90,7 +90,6 @@ const GuideDetail = () => {
                 ))}
               </ul>
             </div>
-            {/* <hr /> */}
             {user && (
               <div>
                 <form onSubmit={handleSubmitComment}>
