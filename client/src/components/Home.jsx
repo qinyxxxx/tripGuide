@@ -134,7 +134,7 @@ const Home = () => {
             show={deleteModalShow}
             onHide={handleDeleteModalHide}
             onDelete={handleDelete}
-            content={`Are you sure you want to delete ${guideToDelete.title}?`}
+            content={`Are you sure you want to delete "${guideToDelete.title}"?`}
           />
         )}
     </div >

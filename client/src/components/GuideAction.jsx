@@ -64,7 +64,7 @@ const GuideAction = () => {
     e.preventDefault();
 
     const handleAction = async () => {
-      try {
+      try { 
         const newGuide = {
           title: formData.title,
           country: formData.country,
@@ -89,6 +89,7 @@ const GuideAction = () => {
 
   const [cities, setCities] = useState([]);
   const handleCountryChange = (e) => {
+    setCities([]);
     const countryIso = e.target.value;
     setFormData((prevFormData) => ({ ...prevFormData, country: countryIso }));
     getCities(countryIso).then((citiesData) => {
@@ -105,7 +106,7 @@ const GuideAction = () => {
           <div className="col-md-8">
             <div className="card shadow">
               <div className="card-body">
-                <button onClick={() => window.history.back()} className="btn float-start"><i className="bi bi-backspace-fill"></i></button>
+                <button onClick={() => window.history.back()} className="btn float-start"><i className="bi bi-arrow-left"></i></button>
                 {action === "create" ? (
                   <h3 className="card-title text-center mb-4">Create New Post</h3>
                 ) : (
@@ -137,7 +138,7 @@ const GuideAction = () => {
                       >
                         <option value="">Select a country</option>
                         {countries.map(country => (
-                          <option key={country.Iso2} value={country.name}>
+                          <option key={country.iso2} value={country.iso2}>
                             {country.name}
                           </option>
                         ))}
@@ -145,15 +146,7 @@ const GuideAction = () => {
                     </div>
                     <div className="col">
                       <label htmlFor="city" className="form-label">City</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="city"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleChange}
-                      />
-                      {/* <select
+                      <select
                         className="form-control"
                         id="city"
                         name="city"
@@ -167,7 +160,7 @@ const GuideAction = () => {
                             {city.name}
                           </option>
                         ))}
-                      </select> */}
+                      </select>
                     </div>
                   </div>
                   <div className="row mb-3">

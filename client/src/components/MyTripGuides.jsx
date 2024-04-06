@@ -81,6 +81,8 @@ const MyTripGuides = () => {
                 <div className="card-body">
                   {user && (user.sub === guide.guser.auth0Id) && (
                     <>
+                      
+                      {guide.isPrivate ? (<i className="bi bi-lock-fill float-start"></i>) : (<i className="bi bi-unlock float-start"></i>)} 
                       <button type="button" className="btn btn-sm float-end me-2"
                         onClick={() => handleDeleteClick(guide)}>
                         <i className="bi bi-trash"></i>
@@ -149,7 +151,7 @@ const MyTripGuides = () => {
             show={deleteModalShow}
             onHide={handleDeleteModalHide}
             onDelete={handleDelete}
-            content={`Are you sure you want to delete ${guideToDelete.title}?`}
+            content={`Are you sure you want to delete "${guideToDelete.title}"?`}
           />
         )}
     </div >

@@ -4,28 +4,49 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { Link, useParams } from "react-router-dom";
 import useTripGuides from "../hooks/useTripGuides";
 import useComments from "../hooks/useComments";
+import DeleteModal from "./DeleteModal";
+
+const formattedDate = (dateString) => {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Month is zero-indexed
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${year}/${month}/${day} ${hours}:${minutes}`;
+};
 
 const GuideDetail = () => {
   const { user } = useAuth0();
   const { id } = useParams();
-  const { useSingleGuide } = useTripGuides();
+  const { useSingleGuide, deleteTripGuide } = useTripGuides();
   const guide = useSingleGuide(id);
   const { comments, createComment } = useComments(id);
   const [newCommentContent, setNewCommentContent] = useState("");
 
+  const [deleteModalShow, setDeleteModalShow] = useState(false);
+  const [guideToDelete, setGuideToDelete] = useState(null);
+  const handleDeleteClick = (guide) => {
+    setGuideToDelete(guide);
+    setDeleteModalShow(true);
+  };
+
+  const handleDeleteModalHide = () => {
+    setDeleteModalShow(false);
+  };
+
+  const handleDelete = async () => {
+    try {
+      await deleteTripGuide(guideToDelete.id);
+      handleDeleteModalHide();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   if (!guide) { // todo bug
     return <div>Loading...</div>;
   }
-
-  const formattedDate = (dateString) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Month is zero-indexed
-    const day = String(date.getDate()).padStart(2, "0");
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    return `${year}/${month}/${day} ${hours}:${minutes}`;
-  };
 
   const handleSubmitComment = async (e) => {
     e.preventDefault();
@@ -40,6 +61,9 @@ const GuideDetail = () => {
     }
   };
 
+
+
+
   return (
     <div>
       <Header />
@@ -47,11 +71,17 @@ const GuideDetail = () => {
         <div className="card">
           <div className="card-body">
             {user && user.sub === guide.guser.auth0Id && (
-              <Link to={`/guide/edit/${id}`} className="btn btn-primary float-end">
-                Edit
-              </Link>
+              <>
+                <button type="button" className="btn btn-primary float-end "
+                  onClick={() => handleDeleteClick(guide)}>
+                  Delete
+                </button>
+                <Link to={`/guide/edit/${id}`} className="btn btn-primary float-end me-2">
+                  Edit
+                </Link>
+              </>
             )}
-            {guide.isPrivate ? (<i className="bi bi-lock-fill fs-5"></i>) : (<i className="bi bi-unlock fs-5"></i>)} 
+            {guide.isPrivate ? (<i className="bi bi-lock-fill fs-5"></i>) : (<i className="bi bi-unlock fs-5"></i>)}
             <h2 className="card-title text-center">{guide.title}</h2>
             <p className="card-text">
               <strong>Country:</strong> {guide.country}
@@ -111,6 +141,16 @@ const GuideDetail = () => {
           </div>
         </div>
       </div>
+      {deleteModalShow &&
+        guideToDelete &&
+        (
+          <DeleteModal
+            show={deleteModalShow}
+            onHide={handleDeleteModalHide}
+            onDelete={handleDelete}
+            content={`Are you sure you want to delete "${guideToDelete.title}"?`}
+          />
+        )}
     </div>
   );
 };
