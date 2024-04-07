@@ -20,6 +20,8 @@ const GuideAction = () => {
   const { useSingleGuide, createTripGuide, updateTripGuide } = useTripGuides();
   const location = useLocation();
   const action = location.pathname.split("/")[2];
+  const { countries, getCities } = useCountryCity();
+  const [cities, setCities] = useState([]);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -29,25 +31,26 @@ const GuideAction = () => {
     rating: "",
     cost: "",
     content: "",
-    isPrivate: true,
+    isPrivate: false,
   });
 
   const singleGuide = useSingleGuide(id);
 
   useEffect(() => {
     if (singleGuide && action === 'edit') {
-      setFormData({
-        title: singleGuide.title,
-        country: singleGuide.country,
-        city: singleGuide.city,
-        duration: singleGuide.duration,
-        rating: singleGuide.rating,
-        cost: singleGuide.cost,
-        content: singleGuide.content,
-        isPrivate: singleGuide.isPrivate,
-      });
+      setFormData(singleGuide);
+      if (singleGuide.country) {
+        getCities(singleGuide.country).then(setCities);
+      }
     }
-  }, [singleGuide, action]);
+  }, [singleGuide, action, getCities]);
+
+  // useEffect(() => {
+  //   if (formData.country && action !== 'edit') {
+  //     getCities(formData.country).then(setCities);
+  //   }
+  // }, [formData.country, action]);
+  
 
   const handleChange = (e) => {
     const { name, value, checked } = e.target;
@@ -86,24 +89,18 @@ const GuideAction = () => {
     handleAction();
   };
 
-  const { countries, getCities } = useCountryCity();
 
-  const [cities, setCities] = useState([]);
   const handleCountryChange = (e) => {
     setCities([]);
     const countryName = e.target.value;
-    const selectedCountry = countries.find(country => country.name === countryName); // 查找选中的国家对象
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      country: countryName,
+    }));
+    getCities(countryName).then((citiesData) => {
+      setCities(citiesData);
+    });
 
-    if (selectedCountry && selectedCountry.iso2) {
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        country: countryName,
-      }));
-      getCities(selectedCountry.iso2).then((citiesData) => {
-        setCities(citiesData);
-      });
-
-    }
   };
 
   return (
@@ -147,7 +144,6 @@ const GuideAction = () => {
                         <option value="">Select a country</option>
                         {countries.map(country => (
                           <option key={country.iso2} value={country.name}>
-                            {/* todo 有bug，想让数据库存name，但是又想拿到iso */}
                             {country.name}
                           </option>
                         ))}

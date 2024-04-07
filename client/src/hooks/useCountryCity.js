@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 const useCountryCity = () => {
   const [countries, setCountries] = useState([]);
+
   const getCountries = async () => {
     try {
-      const response = await fetch('https://api.countrystatecity.in/v1/countries',{
+      const response = await fetch('https://api.countrystatecity.in/v1/countries', {
         method: "GET",
         headers: {
           "X-CSCAPI-KEY": process.env.REACT_APP_EXTERNAL_API_KEY,
@@ -20,9 +21,15 @@ const useCountryCity = () => {
     }
   };
 
-  const getCities = async (countryIso2) => {
+  const getCities = useCallback(async (countryName) => {
+    if (!countryName || !countries.length) return [];
+
+    const country = countries.find(country => country.name === countryName);
+    if (!country) {
+      throw new Error("Country not found");
+    }
     try {
-      const response = await fetch(`https://api.countrystatecity.in/v1/countries/${countryIso2}/cities`, {
+      const response = await fetch(`https://api.countrystatecity.in/v1/countries/${country.iso2}/cities`, {
         method: "GET",
         headers: {
           "X-CSCAPI-KEY": process.env.REACT_APP_EXTERNAL_API_KEY,
@@ -32,18 +39,18 @@ const useCountryCity = () => {
         throw new Error("Failed to get cities");
       }
       const data = await response.json();
-      const uniqueData = data.reduce((acc, current) => {
+      const uniqueCities = data.reduce((acc, current) => {
         if (!acc.some(item => item.name === current.name)) {
           acc.push(current);
         }
         return acc;
       }, []);
-
-      return uniqueData;
+      return uniqueCities;
     } catch (error) {
       console.error(error);
+      return [];
     }
-  };
+  }, [countries]);
 
   useEffect(() => {
     getCountries();

@@ -71,13 +71,13 @@ async function validateTripGuideData(req, res) {
   if (typeof data.rating !== "number" || data.rating < 1 || data.rating > 5) {
     return res.status(400).json({ error: "Rating must be a number between 1 and 5" });
   }
-  if (data.cost && (typeof data.cost !== "number" || data.cost <= 0)) {
+  if (typeof data.cost !== "number" || data.cost <= 0) {
     return res.status(400).json({ error: "Cost must be a positive number" });
   }
   if (typeof data.content !== "string" || data.content.length > 1000) {
     return res.status(400).json({ error: "Content must be a string with max length of 1000 characters" });
   }
-  if (data.duration && (typeof data.duration !== "number" || data.duration <= 0)) {
+  if (typeof data.duration !== "number" || data.duration <= 0) {
     return res.status(400).json({ error: "Days must be a positive number" });
   }
   return true;

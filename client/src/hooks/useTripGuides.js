@@ -94,10 +94,11 @@ const useTripGuides = () => {
     if (typeof guideData.content !== "string" || guideData.content.length > 1000) {
       errorMessage = "Content must be a string with max length of 1000 characters";
     }
-    if (guideData.duration && (typeof guideData.duration !== "number" || guideData.duration <= 0)) {
+    if (typeof guideData.duration !== "number" || guideData.duration <= 0) {
+      console.log("here");
       errorMessage = "Days must be a positive number";
     }
-    if (guideData.cost && (typeof guideData.cost !== "number" || guideData.cost <= 0)) {
+    if (typeof guideData.cost !== "number" || guideData.cost <= 0) {
       errorMessage = "Cost must be a positive number";
     }
     return { isValid: !errorMessage, errorMessage };
