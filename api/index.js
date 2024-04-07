@@ -155,7 +155,6 @@ app.get("/my-tripguides", requireAuth, async (req, res) => {
 app.post("/tripguides", requireAuth, async (req, res) => {
   try {
     const isValid = await validateTripGuideData(req, res);
-    // todo validate data
     if (isValid) {
       const auth0Id = req.auth.payload.sub;
       const { title, isPrivate, country, city, duration, rating, cost, content } = req.body;
@@ -236,27 +235,18 @@ app.delete("/tripguides/:id", requireAuth, async (req, res) => {
   }
 
   const tripGuideId = parseInt(req.params.id);
-
-  const comments = await prisma.comment.findMany({
-    where: {
-      tripGuideId: tripGuideId,
-    },
-  });
-
   await prisma.comment.deleteMany({
     where: {
       tripGuideId: tripGuideId,
     },
   });
 
-  // delete comments
-  for (const comment of comments) {
-    await prisma.comment.delete({
-      where: {
-        id: comment.id,
-      },
-    });
-  }
+  const tripGuide = await prisma.tripGuide.delete({
+    where: {
+      id: tripGuideId,
+    },
+  });
+
   res.json(tripGuide);
 });
 

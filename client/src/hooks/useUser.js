@@ -5,6 +5,7 @@ import { useAuthToken } from "../AuthTokenContext";
 const useUser = () => {
   const [user, setUser] = useState("");
   const { accessToken } = useAuthToken();
+  const [isLoading, setIsLoading] = useState(true);
 
   // get user profile
   useEffect(() => {
@@ -22,6 +23,8 @@ const useUser = () => {
         setUser(data);
       } catch (error) {
         console.error(error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -51,7 +54,7 @@ const useUser = () => {
     }
   };
 
-  return [user, updateUserProfile];
+  return [user, isLoading, updateUserProfile];
 }
 
 

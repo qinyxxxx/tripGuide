@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const navigate = useNavigate();
-  const [user, updateUserProfile] = useUser();
+  const [user, isLoading, updateUserProfile] = useUser();
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     gender: '',
@@ -14,16 +14,16 @@ const Profile = () => {
   });
 
   useEffect(() => {
-    if (user) { // todo 有bug，拿不到
+    if (!isLoading && user) {
       setFormData({
         gender: user.gender || 'Prefer not to say',
         birthDate: user.birthDate || '',
         introduction: user.introduction || ''
       });
-    } else {
+    } else if (!isLoading && !user) {
       navigate('/login');
     }
-  }, [user, setFormData, navigate]);
+  }, [user, isLoading, setFormData, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

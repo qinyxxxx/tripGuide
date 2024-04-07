@@ -91,16 +91,20 @@ const GuideAction = () => {
   const [cities, setCities] = useState([]);
   const handleCountryChange = (e) => {
     setCities([]);
-    const countryIso = e.target.value;
-    if (countryIso) {
-      setFormData((prevFormData) => ({ ...prevFormData, country: countryIso }));
-      getCities(countryIso).then((citiesData) => {
+    const countryName = e.target.value;
+    const selectedCountry = countries.find(country => country.name === countryName); // 查找选中的国家对象
+
+    if (selectedCountry && selectedCountry.iso2) {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        country: countryName,
+      }));
+      getCities(selectedCountry.iso2).then((citiesData) => {
         setCities(citiesData);
       });
+
     }
-
   };
-
 
   return (
     <div>
@@ -112,9 +116,9 @@ const GuideAction = () => {
               <div className="card-body">
                 <button onClick={() => window.history.back()} className="btn float-start"><i className="bi bi-arrow-left"></i></button>
                 {action === "create" ? (
-                  <h3 className="card-title text-center mb-4">Create New Post</h3>
+                  <h3 className="card-title text-center mb-4">Create Post</h3>
                 ) : (
-                  <h3 className="card-title text-center mb-4">Edit My Post</h3>
+                  <h3 className="card-title text-center mb-4">Edit Post</h3>
                 )}
                 <form onSubmit={handleSubmit}>
                   <div className="mb-3">
@@ -142,7 +146,7 @@ const GuideAction = () => {
                       >
                         <option value="">Select a country</option>
                         {countries.map(country => (
-                          <option key={country.iso2} value={country.iso2}>
+                          <option key={country.iso2} value={country.name}>
                             {/* todo 有bug，想让数据库存name，但是又想拿到iso */}
                             {country.name}
                           </option>
