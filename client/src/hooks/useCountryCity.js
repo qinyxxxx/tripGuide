@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 
 const useCountryCity = () => {
   const [countries, setCountries] = useState([]);
-  console.log(process.env.REACT_APP_EXTERNAL_API_KEY);
   const getCountries = async () => {
     try {
       const response = await fetch('https://api.countrystatecity.in/v1/countries',{

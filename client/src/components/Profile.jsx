@@ -14,7 +14,7 @@ const Profile = () => {
   });
 
   useEffect(() => {
-    if (user) {
+    if (user) { // todo 有bug，拿不到
       setFormData({
         gender: user.gender || 'Prefer not to say',
         birthDate: user.birthDate || '',

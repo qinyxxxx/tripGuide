@@ -20,7 +20,7 @@ model User {
   name         String?
   birthDate    String?
   gender       String?
-  introduction String?     @db.VarChar(255)
+  introduction String?     @db.VarChar(1000)
   tipGuide     TripGuide[]
   comment      Comment[]
 }
@@ -29,15 +29,15 @@ model TripGuide {
   id        Int       @id @default(autoincrement())
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  guser      User      @relation(fields: [guserId], references: [id])
-  guserId    Int
+  guser     User      @relation(fields: [guserId], references: [id])
+  guserId   Int
   title     String    @db.VarChar(255)
-  isPrivate  Boolean   @default(false)
+  isPrivate Boolean   @default(false)
   country   String    @db.VarChar(255)
   city      String?   @db.VarChar(255)
-  duration  Int       @db.Int
+  duration  Int?      @default(-1) @db.Int
   rating    Int       @db.Int
-  cost      Float?      @default(-1)
+  cost      Float?    @default(-1)
   content   String    @db.Text
   comment   Comment[]
 }
@@ -48,7 +48,7 @@ model Comment {
   updatedAt   DateTime  @updatedAt
   cuser       User      @relation(fields: [cuserId], references: [id])
   cuserId     Int
-  tripGuide   TripGuide @relation(fields: [tripGuideId], references: [id])
+  tripGuide   TripGuide @relation(fields: [tripGuideId], references: [id], onDelete: Cascade)
   tripGuideId Int
   content     String    @db.Text
 }

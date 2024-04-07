@@ -25,20 +25,29 @@ const useComments = (guideId) => {
 
   const createComment = async (newComment) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/tripguides/${guideId}/comments`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(newComment),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to create trip guide");
+      const content = newComment.content;
+      if (!content) {
+        alert(`content is required`);
       }
-      const data = await response.json();
-      setComments((prevComments) => [...prevComments, data]);
-      return data; 
+      if (typeof content !== "string" || content.length > 200) {
+        alert("Content length must less than 200");
+      } else {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/tripguides/${guideId}/comments`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify(newComment),
+        });
+        if (!response.ok) {
+          throw new Error("Failed to create trip guide");
+        }
+        const data = await response.json();
+        setComments((prevComments) => [...prevComments, data]);
+        return data;
+      }
+
     } catch (error) {
       console.error(error);
       return null;

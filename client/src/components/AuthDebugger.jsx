@@ -5,7 +5,6 @@ import Header from "./Header";
 export default function AuthDebugger() {
   const { user } = useAuth0();
   const { accessToken } = useAuthToken();
-  console.log(user);
 
   return (
     <div>

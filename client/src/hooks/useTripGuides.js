@@ -76,48 +76,92 @@ const useTripGuides = () => {
     }
   }, [accessToken]);
 
+  const validateGuideData = async (guideData) => {
+    const requiredFields = ['title', 'country', 'rating', 'content'];
+    let errorMessage = '';
+    for (const field of requiredFields) {
+      if (!guideData[field]) {
+        errorMessage = `${field} is required`;
+        break;
+      }
+    }
+    if (typeof guideData.title !== "string" || guideData.title.length > 30) {
+      errorMessage = "Title must be a string with max length of 30 characters";
+    }
+    if (typeof guideData.rating !== "number" || guideData.rating < 1 || guideData.rating > 5) {
+      errorMessage = "Rating must be a number between 1 and 5";
+    }
+    if (typeof guideData.content !== "string" || guideData.content.length > 1000) {
+      errorMessage = "Content must be a string with max length of 1000 characters";
+    }
+    if (guideData.duration && (typeof guideData.duration !== "number" || guideData.duration <= 0)) {
+      errorMessage = "Days must be a positive number";
+    }
+    if (guideData.cost && (typeof guideData.cost !== "number" || guideData.cost <= 0)) {
+      errorMessage = "Cost must be a positive number";
+    }
+    return { isValid: !errorMessage, errorMessage };
+  };
+
+  // create a new guide
   const createTripGuide = async (newGuideData) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/tripguides`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(newGuideData),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to create trip guide");
+      const { isValid, errorMessage } = await validateGuideData(newGuideData);
+      if (!isValid) {
+        alert(errorMessage);
+        return { success: false, data: null };
+      } else {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/tripguides`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify(newGuideData),
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setTripGuides(prevTripGuides => [...prevTripGuides, data]);
+          return { success: true, data: data };
+        } else {
+          alert(response.json().error);
+          return { success: false, data: null };
+        }
       }
-      const data = await response.json();
-      setTripGuides(prevTripGuides => [...prevTripGuides, data]);
-      return data;
     } catch (error) {
       console.error(error);
-      throw new Error("Failed to create trip guide");
     }
   };
 
   const updateTripGuide = async (guideId, updatedGuideData) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/tripguides/${guideId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(updatedGuideData),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to create trip guide");
+      const { isValid, errorMessage } = await validateGuideData(updatedGuideData);
+      if (!isValid) {
+        alert(errorMessage);
+        return { success: false, data: null };
+      } else {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/tripguides/${guideId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify(updatedGuideData),
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setTripGuides(prevTripGuides =>
+            prevTripGuides.map(guide =>
+              guide.id === guideId ? updatedGuideData : guide
+            )
+          );
+          return { success: true, data: data };
+        } else {
+          alert("hello", response.json().error);
+          return { success: false, data: null };
+        }
       }
-      const data = await response.json();
-      setTripGuides(prevTripGuides =>
-        prevTripGuides.map(guide =>
-          guide.id === guideId ? updatedGuideData : guide
-        )
-      );
-      return data;
+
     } catch (error) {
       console.error(error);
       return null;

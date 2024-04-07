@@ -64,7 +64,7 @@ const GuideAction = () => {
     e.preventDefault();
 
     const handleAction = async () => {
-      try { 
+      try {
         const newGuide = {
           title: formData.title,
           country: formData.country,
@@ -75,11 +75,12 @@ const GuideAction = () => {
           content: formData.content,
           isPrivate: formData.isPrivate
         }
-        const res = action === 'edit' ? await updateTripGuide(id, newGuide) : await createTripGuide(newGuide);
-
-        navigate(`/guide/detail/${res.id}`);
+        const { success, data } = action === 'edit' ? await updateTripGuide(id, newGuide) : await createTripGuide(newGuide);
+        if (success) {
+          navigate(`/guide/detail/${data.id}`);
+        }
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     };
     handleAction();
@@ -91,10 +92,13 @@ const GuideAction = () => {
   const handleCountryChange = (e) => {
     setCities([]);
     const countryIso = e.target.value;
-    setFormData((prevFormData) => ({ ...prevFormData, country: countryIso }));
-    getCities(countryIso).then((citiesData) => {
-      setCities(citiesData);
-    });
+    if (countryIso) {
+      setFormData((prevFormData) => ({ ...prevFormData, country: countryIso }));
+      getCities(countryIso).then((citiesData) => {
+        setCities(citiesData);
+      });
+    }
+
   };
 
 
@@ -114,7 +118,7 @@ const GuideAction = () => {
                 )}
                 <form onSubmit={handleSubmit}>
                   <div className="mb-3">
-                    <label htmlFor="title" className="form-label">Title</label>
+                    <label htmlFor="title" className="form-label">Title</label><span className="required">*</span>
                     <input
                       type="text"
                       className="form-control"
@@ -127,7 +131,7 @@ const GuideAction = () => {
                   </div>
                   <div className="row mb-3">
                     <div className="col">
-                      <label htmlFor="country" className="form-label">Country</label>
+                      <label htmlFor="country" className="form-label">Country</label><span className="required">*</span>
                       <select
                         className="form-control"
                         id="country"
@@ -139,6 +143,7 @@ const GuideAction = () => {
                         <option value="">Select a country</option>
                         {countries.map(country => (
                           <option key={country.iso2} value={country.iso2}>
+                            {/* todo 有bug，想让数据库存name，但是又想拿到iso */}
                             {country.name}
                           </option>
                         ))}
@@ -152,7 +157,6 @@ const GuideAction = () => {
                         name="city"
                         value={formData.city}
                         onChange={(e) => setFormData((prevFormData) => ({ ...prevFormData, city: e.target.value }))}
-                        required
                       >
                         <option value="">Select a city</option>
                         {cities.map(city => (
@@ -176,7 +180,7 @@ const GuideAction = () => {
                       />
                     </div>
                     <div className="col">
-                      <label htmlFor="rating" className="form-label">Rating</label>
+                      <label htmlFor="rating" className="form-label">Rating</label><span className="required">*</span>
                       <select
                         className="form-select"
                         id="rating"
@@ -204,7 +208,7 @@ const GuideAction = () => {
                     </div>
                   </div>
                   <div className="mb-3">
-                    <label htmlFor="content" className="form-label">Content</label>
+                    <label htmlFor="content" className="form-label">Content</label><span className="required">*</span>
                     <textarea
                       className="form-control"
                       id="content"
@@ -230,7 +234,6 @@ const GuideAction = () => {
                   </div>
                   <div className="text-center">
                     <button type="submit" className="btn btn-primary">Submit</button>
-
                   </div>
                 </form>
               </div>

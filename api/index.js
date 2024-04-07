@@ -57,7 +57,33 @@ app.post("/verify-user", requireAuth, async (req, res) => {
 });
 
 // ====================================== trip guide endpoint ==========================================
-// get all guides
+async function validateTripGuideData(req, res) {
+  const requiredFields = ['title', 'country', 'rating', 'content'];
+  const data = req.body;
+  for (const field of requiredFields) {
+    if (!data[field]) {
+      return res.status(400).json({ error: `${field} is required` });
+    }
+  }
+  if (typeof data.title !== "string" || data.title.length > 30) {
+    return res.status(400).json({ error: "Title must be a string with max length of 30 characters" });
+  }
+  if (typeof data.rating !== "number" || data.rating < 1 || data.rating > 5) {
+    return res.status(400).json({ error: "Rating must be a number between 1 and 5" });
+  }
+  if (data.cost && (typeof data.cost !== "number" || data.cost <= 0)) {
+    return res.status(400).json({ error: "Cost must be a positive number" });
+  }
+  if (typeof data.content !== "string" || data.content.length > 1000) {
+    return res.status(400).json({ error: "Content must be a string with max length of 1000 characters" });
+  }
+  if (data.duration && (typeof data.duration !== "number" || data.duration <= 0)) {
+    return res.status(400).json({ error: "Days must be a positive number" });
+  }
+  return true;
+}
+
+// GET: get all guides
 app.get("/tripguides", async (req, res) => {
   const tripguides = await prisma.tripGuide.findMany({
     where: {
@@ -79,7 +105,7 @@ app.get("/tripguides", async (req, res) => {
   res.json(tripguides);
 });
 
-// get a triguide by id
+// GET: get a triguide by id
 app.get("/tripguides/:id", async (req, res) => {
   const tripGuide = await prisma.tripGuide.findUnique({
     where: {
@@ -97,7 +123,7 @@ app.get("/tripguides/:id", async (req, res) => {
   res.json(tripGuide);
 });
 
-// get my tripguides
+// GET: get my tripguides
 app.get("/my-tripguides", requireAuth, async (req, res) => {
   const auth0Id = req.auth.payload.sub;
   const user = await prisma.user.findUnique({
@@ -125,63 +151,75 @@ app.get("/my-tripguides", requireAuth, async (req, res) => {
   res.json(tripGuide);
 });
 
-// post a guide, need auth
+// POST: post a guide, need auth
 app.post("/tripguides", requireAuth, async (req, res) => {
-  const auth0Id = req.auth.payload.sub;
-  // todo validate data
-
-  const { title, isPrivate, country, city, duration, rating, cost, content } = req.body;
-
-  const tripGuide = await prisma.tripGuide.create({
-    data: {
-      guser: { connect: { auth0Id } },
-      title,
-      isPrivate,
-      country,
-      city,
-      duration,
-      rating,
-      cost,
-      content,
+  try {
+    const isValid = await validateTripGuideData(req, res);
+    // todo validate data
+    if (isValid) {
+      const auth0Id = req.auth.payload.sub;
+      const { title, isPrivate, country, city, duration, rating, cost, content } = req.body;
+      const tripGuide = await prisma.tripGuide.create({
+        data: {
+          guser: { connect: { auth0Id } },
+          title,
+          isPrivate,
+          country,
+          city,
+          duration,
+          rating,
+          cost,
+          content,
+        }
+      });
+      return res.json(tripGuide);
     }
-  });
 
-  res.json(tripGuide);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 // update one of my guide, need auth
 app.put("/tripguides/:id", requireAuth, async (req, res) => {
-  const auth0Id = req.auth.payload.sub;
-  // todo validate data
-  // need to check if this post is mine
+  try {
+    const isValid = await validateTripGuideData(req, res);
+    if (isValid) {
+      const { title, isPrivate, country, city, duration, rating, cost, content } = req.body;
+      const auth0Id = req.auth.payload.sub;
 
-  const id = req.params.id;
-  const user = await prisma.user.findUnique({
-    where: {
-      auth0Id,
-    },
-  });
-
-  const { title, isPrivate, country, city, duration, rating, cost, content } = req.body;
-
-  const updateTripGuide = await prisma.tripGuide.update({
-    where: {
-      id: parseInt(id),
-      guserId: user.id,
-    },
-    data: {
-      title,
-      isPrivate,
-      country,
-      city,
-      duration,
-      rating,
-      cost,
-      content,
+      const id = req.params.id;
+      const user = await prisma.user.findUnique({
+        where: {
+          auth0Id,
+        },
+      });
+      if (!user) {
+        return res.status(400).json({ error: "User not found" });
+      }
+      const updateTripGuide = await prisma.tripGuide.update({
+        where: {
+          id: parseInt(id),
+          guserId: user.id,
+        },
+        data: {
+          title,
+          isPrivate,
+          country,
+          city,
+          duration,
+          rating,
+          cost,
+          content,
+        }
+      });
+      return res.json(updateTripGuide);
     }
-  });
-
-  res.json(updateTripGuide);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 // delete tripGuide with :id
@@ -192,17 +230,49 @@ app.delete("/tripguides/:id", requireAuth, async (req, res) => {
       auth0Id,
     },
   });
-  const id = req.params.id;
-  const triguide = await prisma.tripGuide.delete({
+
+  if (!user) {
+    return res.status(400).json({ error: "User not found" });
+  }
+
+  const tripGuideId = parseInt(req.params.id);
+
+  const comments = await prisma.comment.findMany({
     where: {
-      id: parseInt(id),
-      guserId: user.id,
-    }
+      tripGuideId: tripGuideId,
+    },
   });
-  res.json(triguide);
+
+  await prisma.comment.deleteMany({
+    where: {
+      tripGuideId: tripGuideId,
+    },
+  });
+
+  // delete comments
+  for (const comment of comments) {
+    await prisma.comment.delete({
+      where: {
+        id: comment.id,
+      },
+    });
+  }
+  res.json(tripGuide);
 });
 
-// ====================================== guide commtent endpoint ==========================================
+// ====================================== guide comment endpoint ==========================================
+
+async function validateCommentData(req, res) {
+  const data = req.body;
+  const content = data['content'];
+  if (!content) {
+    return res.status(400).json({ error: `content is required` });
+  }
+  if (typeof content !== "string" || content.length > 200) {
+    return res.status(400).json({ error: "Content must be a string with max length of 200 characters" });
+  }
+  return true;
+}
 
 // get comments by trip guide id
 app.get("/tripguides/:id/comments", async (req, res) => {
@@ -220,29 +290,45 @@ app.get("/tripguides/:id/comments", async (req, res) => {
 
 // post a comment, need auth
 app.post("/tripguides/:id/comments", requireAuth, async (req, res) => {
-  const auth0Id = req.auth.payload.sub;
-  const guideId = req.params.id;
-  // todo validate data
-
-  const { content } = req.body;
-  const user = await prisma.user.findUnique({
-    where: {
-      auth0Id,
-    },
-  });
-
-  const comment = await prisma.comment.create({
-    data: {
-      cuserId: user.id,
-      tripGuideId: parseInt(guideId),
-      content,
-    },
-    include: {
-      cuser: true,
-    },
-  });
-
-  res.json(comment);
+  try {
+    const isValid = await validateCommentData(req, res);
+    if (isValid) {
+      const guideId = req.params.id;
+      
+      const guide = await prisma.tripGuide.findUnique({
+        where: {
+          id: parseInt(guideId),
+        },
+      });
+      if (!guide) {
+        return res.status(400).json({ error: "Guide not found" });
+      }
+      const auth0Id = req.auth.payload.sub;
+      const user = await prisma.user.findUnique({
+        where: {
+          auth0Id,
+        },
+      });
+      // check if this user exists
+      if (!user) {
+        return res.status(400).json({ error: "User not found" });
+      }
+      const comment = await prisma.comment.create({
+        data: {
+          cuserId: user.id,
+          tripGuideId: parseInt(guideId),
+          content: req.body.content,
+        },
+        include: {
+          cuser: true,
+        },
+      });
+      return res.json(comment);
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 // delete a comment, need auth
@@ -282,21 +368,27 @@ app.get("/user", requireAuth, async (req, res) => {
 });
 
 app.put("/user", requireAuth, async (req, res) => {
-  const auth0Id = req.auth.payload.sub;
-
-  const { gender, birthDate, introduction } = req.body;
-  const updateUser = await prisma.user.update({
-    where: {
-      auth0Id: auth0Id
-    },
-    data: {
-      gender,
-      birthDate,
-      introduction,
+  try {
+    const auth0Id = req.auth.payload.sub;
+    const { gender, birthDate, introduction } = req.body;
+    if (typeof introduction !== "string" || introduction.length > 1000) {
+      return res.status(400).json({ error: "Introduction must be a string with max length of 1000 characters" });
     }
-  });
-
-  res.json(updateUser);
+    const updateUser = await prisma.user.update({
+      where: {
+        auth0Id: auth0Id
+      },
+      data: {
+        gender,
+        birthDate,
+        introduction,
+      }
+    });
+    return res.json(updateUser);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 

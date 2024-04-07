@@ -49,6 +49,7 @@ const MyTripGuides = () => {
     try {
       await deleteTripGuide(guideToDelete.id);
       handleDeleteModalHide();
+      window.location.reload();
     } catch (error) {
       console.error(error);
     }
@@ -81,8 +82,8 @@ const MyTripGuides = () => {
                 <div className="card-body">
                   {user && (user.sub === guide.guser.auth0Id) && (
                     <>
-                      
-                      {guide.isPrivate ? (<i className="bi bi-lock-fill float-start"></i>) : (<i className="bi bi-unlock float-start"></i>)} 
+
+                      {guide.isPrivate ? (<i className="bi bi-lock-fill float-start"></i>) : (<i className="bi bi-unlock float-start"></i>)}
                       <button type="button" className="btn btn-sm float-end me-2"
                         onClick={() => handleDeleteClick(guide)}>
                         <i className="bi bi-trash"></i>

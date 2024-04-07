@@ -39,6 +39,7 @@ const GuideDetail = () => {
     try {
       await deleteTripGuide(guideToDelete.id);
       handleDeleteModalHide();
+      window.history.back();
     } catch (error) {
       console.error(error);
     }
@@ -81,8 +82,8 @@ const GuideDetail = () => {
                 </Link>
               </>
             )}
-            {guide.isPrivate ? (<i className="bi bi-lock-fill fs-5"></i>) : (<i className="bi bi-unlock fs-5"></i>)}
-            <h2 className="card-title text-center">{guide.title}</h2>
+            <button onClick={() => window.history.back()} className="btn float-start"><i className="bi bi-arrow-left"></i></button>
+            <h2 className="card-title text-center">{guide.isPrivate ? (<i className="bi bi-lock-fill fs-5"></i>) : (<i className="bi bi-unlock fs-5"></i>)} {guide.title}</h2>
             <p className="card-text">
               <strong>Country:</strong> {guide.country}
             </p>
@@ -90,14 +91,18 @@ const GuideDetail = () => {
               <strong>City:</strong> {guide.city}
             </p>
             <p className="card-text">
+              <strong>Rating:</strong> {guide.rating}
+            </p>
+            <p className="card-text">
+              <strong>Cost:</strong> ${guide.cost}
+            </p>
+            <p className="card-text">
               <strong>Days:</strong> {guide.duration}
             </p>
             <p className="card-text">
               <strong>Content:</strong> {guide.content}
             </p>
-            <p className="card-text">
-              <strong>Rating:</strong> {guide.rating}
-            </p>
+            
             <div className="d-flex justify-content-end">
               <small>
                 Posted by {guide.guser.name} on {formattedDate(guide.createdAt)}

@@ -41,6 +41,7 @@ const Home = () => {
     try {
       await deleteTripGuide(guideToDelete.id);
       handleDeleteModalHide();
+      window.location.reload();
     } catch (error) {
       console.error(error);
     }
