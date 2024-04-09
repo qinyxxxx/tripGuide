@@ -9,6 +9,11 @@ const useUser = () => {
 
   // get user profile
   useEffect(() => {
+    if (!accessToken) {
+      setIsLoading(false);
+      return;
+    }
+
     const getUserProfile = async () => {
       try {
         const response = await fetch(`${process.env.REACT_APP_API_URL}/user`, {
@@ -54,7 +59,7 @@ const useUser = () => {
     }
   };
 
-  return [user, isLoading, updateUserProfile];
+  return { user, isLoading, updateUserProfile };
 }
 
 

@@ -27,5 +27,16 @@ body {
 }
 
 .active-link {
-  text-decoration: underline; /* 或使用其他样式来高亮显示 */
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .greeting {
+    display: none;
+  }
+  .logout-button-container {
+    display: flex;
+    justify-content: center;
+    width: 100%; /* 确保容器宽度为100% */
+  }
 }

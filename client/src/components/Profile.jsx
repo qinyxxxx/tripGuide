@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const navigate = useNavigate();
-  const [user, isLoading, updateUserProfile] = useUser();
+  const { user, isLoading, updateUserProfile } = useUser();
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     gender: '',
@@ -14,16 +14,22 @@ const Profile = () => {
   });
 
   useEffect(() => {
-    if (!isLoading && user) {
-      setFormData({
-        gender: user.gender || 'Prefer not to say',
-        birthDate: user.birthDate || '',
-        introduction: user.introduction || ''
-      });
-    } else if (!isLoading && !user) {
-      navigate('/login');
+    console.log('useEffect ran');
+    console.log('user:', user);
+    console.log("isLoading:", isLoading);
+    if (!isLoading) {
+      if (user) {
+        setFormData({
+          gender: user.gender || 'Prefer not to say',
+          birthDate: user.birthDate || '',
+          introduction: user.introduction || ''
+        });
+      } else {
+        navigate('/login');
+      }
     }
-  }, [user, isLoading, setFormData, navigate]);
+  }, [user, isLoading, navigate]);
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,7 +56,8 @@ const Profile = () => {
   const handleClose = () => setShowModal(false);
 
   return (
-    <div><Header></Header>
+    <div>
+      <Header />
       <div className="container mt-5">
         <div className="row justify-content-center">
           <div className="col-md-6">
@@ -106,7 +113,7 @@ const Profile = () => {
                   <p className="form-control-plaintext">{user.email}</p>
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="gender">Gender:</label>
+                  <label htmlFor="gender"><strong>Gender</strong></label>
                   <select
                     className="form-control"
                     id="gender"

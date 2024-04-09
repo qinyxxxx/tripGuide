@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Header from "./Header";
 import { useAuth0 } from "@auth0/auth0-react";
-import { Link, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useTripGuides from "../hooks/useTripGuides";
 import useComments from "../hooks/useComments";
 import DeleteModal from "./DeleteModal";
@@ -18,6 +18,7 @@ const formattedDate = (dateString) => {
 
 const GuideDetail = () => {
   const { user } = useAuth0();
+  const navigate = useNavigate();
   const { id } = useParams();
   const { useSingleGuide, deleteTripGuide } = useTripGuides();
   const guide = useSingleGuide(id);
@@ -45,7 +46,7 @@ const GuideDetail = () => {
     }
   };
 
-  if (!guide) { // todo bug
+  if (!guide) {
     return <div>Loading...</div>;
   }
 
@@ -62,9 +63,6 @@ const GuideDetail = () => {
     }
   };
 
-
-
-
   return (
     <div>
       <Header />
@@ -77,12 +75,13 @@ const GuideDetail = () => {
                   onClick={() => handleDeleteClick(guide)}>
                   Delete
                 </button>
-                <Link to={`/guide/edit/${id}`} className="btn btn-primary float-end me-2">
+                <button type="button" className="btn btn-primary float-end me-2"
+                  onClick={() => {navigate(`/guide/edit/${id}`);}}>
                   Edit
-                </Link>
+                </button>
               </>
             )}
-            <button onClick={() => window.history.back()} className="btn float-start"><i className="bi bi-arrow-left"></i></button>
+            <button onClick={() => {navigate('/');}} className="btn float-start"><i className="bi bi-arrow-left"></i></button>
             <h2 className="card-title text-center">{guide.isPrivate ? (<i className="bi bi-lock-fill fs-5"></i>) : (<i className="bi bi-unlock fs-5"></i>)} {guide.title}</h2>
             <p className="card-text">
               <strong>Country:</strong> {guide.country}

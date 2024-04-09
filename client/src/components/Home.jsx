@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Header from "./Header";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import useTripGuides from "../hooks/useTripGuides";
 import DeleteModal from "./DeleteModal";
@@ -8,6 +8,7 @@ import DeleteModal from "./DeleteModal";
 const Home = () => {
   const { tripGuides, deleteTripGuide } = useTripGuides();
   const { user } = useAuth0();
+  const navigate = useNavigate();
 
   const formattedDate = (dateString) => {
     const date = new Date(dateString);
@@ -49,7 +50,7 @@ const Home = () => {
 
   return (
     <div>
-      <Header className="fixed-top" />
+      <Header />
       <div className="container mt-4">
         <div className="text-center">
           <Link to="/guide/create" className="btn btn-primary">
@@ -68,9 +69,10 @@ const Home = () => {
                 <div className="card-body">
                   {user && (user.sub === guide.guser.auth0Id) && (
                     <>
-                      <Link to={`/guide/edit/${guide.id}`} className="btn btn-sm float-end">
+                      <button type="button" className="btn btn-sm float-end"
+                        onClick={() => { navigate(`/guide/edit/${guide.id}`); }}>
                         <i className="bi bi-pencil"></i>
-                      </Link>
+                      </button>
                       <button type="button" className="btn btn-sm float-end me-2"
                         onClick={() => handleDeleteClick(guide)}>
                         <i className="bi bi-trash"></i>
@@ -99,9 +101,10 @@ const Home = () => {
                     <small className="text-muted">
                       Posted by {guide.guser.name} on {" "} {formattedDate(guide.createdAt)}
                     </small>
-                    <Link to={`/guide/detail/${guide.id}`} className="btn btn-primary">
-                      View Details
-                    </Link>
+                    <button type="button" className="btn btn-primary"
+                      onClick={() => { navigate(`/guide/detail/${guide.id}`);}}>
+                      Details
+                    </button>
                   </div>
                   <hr />
                   <div>

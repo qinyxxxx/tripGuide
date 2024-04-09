@@ -116,9 +116,10 @@ const MyTripGuides = () => {
                     <small className="text-muted">
                       Posted by {guide.guser.name} on {" "} {formattedDate(guide.createdAt)}
                     </small>
-                    <Link to={`/guide/detail/${guide.id}`} className="btn btn-primary">
-                      View Details
-                    </Link>
+                    <button type="button" className="btn btn-primary"
+                      onClick={() => { navigate(`/guide/detail/${guide.id}`);}}>
+                      Details
+                    </button>
                   </div>
                   <hr />
                   <div>
