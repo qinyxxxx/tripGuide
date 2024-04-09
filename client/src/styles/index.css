@@ -3,13 +3,13 @@ body {
 }
 
 .btn-primary {
-  background-color: #e17198;
-  border-color: #e17198;
+  background-color: #D94A7C;
+  border-color: #D94A7C;
 }
 
 .btn-primary:hover {
-  background-color: #da356c;
-  border-color: #da356c;
+  background-color: #A92857;
+  border-color: #A92857;
 }
 
 .btn-secondary {
@@ -37,6 +37,6 @@ body {
   .logout-button-container {
     display: flex;
     justify-content: center;
-    width: 100%; /* 确保容器宽度为100% */
+    width: 100%;
   }
 }

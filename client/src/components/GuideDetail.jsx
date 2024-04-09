@@ -71,17 +71,19 @@ const GuideDetail = () => {
           <div className="card-body">
             {user && user.sub === guide.guser.auth0Id && (
               <>
-                <button type="button" className="btn btn-primary float-end "
+                <button type="button" className="btn btn-primary float-end" aria-label="delete guide"
                   onClick={() => handleDeleteClick(guide)}>
                   Delete
                 </button>
-                <button type="button" className="btn btn-primary float-end me-2"
-                  onClick={() => {navigate(`/guide/edit/${id}`);}}>
+                <button type="button" className="btn btn-primary float-end me-2" aria-label="edit guide"
+                  onClick={() => { navigate(`/guide/edit/${id}`); }}>
                   Edit
                 </button>
               </>
             )}
-            <button onClick={() => {navigate('/');}} className="btn float-start"><i className="bi bi-arrow-left"></i></button>
+            <button onClick={() => { navigate('/'); }} className="btn float-start" aria-label="go back">
+              <i className="bi bi-arrow-left"></i>
+            </button>
             <h2 className="card-title text-center">{guide.isPrivate ? (<i className="bi bi-lock-fill fs-5"></i>) : (<i className="bi bi-unlock fs-5"></i>)} {guide.title}</h2>
             <p className="card-text">
               <strong>Country:</strong> {guide.country}
@@ -101,7 +103,6 @@ const GuideDetail = () => {
             <p className="card-text">
               <strong>Content:</strong> {guide.content}
             </p>
-            
             <div className="d-flex justify-content-end">
               <small>
                 Posted by {guide.guser.name} on {formattedDate(guide.createdAt)}
@@ -136,7 +137,7 @@ const GuideDetail = () => {
                       onChange={e => setNewCommentContent(e.target.value)}
                     ></textarea>
                   </div>
-                  <button type="submit" className="btn btn-primary">
+                  <button type="submit" className="btn btn-primary" aria-label="submit comment">
                     Submit
                   </button>
                 </form>

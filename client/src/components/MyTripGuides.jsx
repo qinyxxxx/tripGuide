@@ -69,7 +69,7 @@ const MyTripGuides = () => {
       <Header className="fixed-top" />
       <div className="container mt-4">
         <div className="text-center">
-          <Link to="/guide/create" className="btn btn-primary">
+          <Link to="/guide/create" className="btn btn-primary" aria-label="Create a new guide">
             Create New Guide
           </Link>
         </div>
@@ -82,15 +82,15 @@ const MyTripGuides = () => {
                 <div className="card-body">
                   {user && (user.sub === guide.guser.auth0Id) && (
                     <>
-
                       {guide.isPrivate ? (<i className="bi bi-lock-fill float-start"></i>) : (<i className="bi bi-unlock float-start"></i>)}
-                      <button type="button" className="btn btn-sm float-end me-2"
+                      <button type="button" className="btn btn-sm float-end" aria-label="edit guide"
+                        onClick={() => { navigate(`/guide/edit/${guide.id}`); }}>
+                        <i className="bi bi-pencil"></i>
+                      </button>
+                      <button type="button" className="btn btn-sm float-end me-2" aria-label="Delete guide"
                         onClick={() => handleDeleteClick(guide)}>
                         <i className="bi bi-trash"></i>
                       </button>
-                      <Link to={`/guide/edit/${guide.id}`} className="btn btn-sm float-end">
-                        <i className="bi bi-pencil"></i>
-                      </Link>
 
                     </>
                   )}
@@ -116,7 +116,7 @@ const MyTripGuides = () => {
                     <small className="text-muted">
                       Posted by {guide.guser.name} on {" "} {formattedDate(guide.createdAt)}
                     </small>
-                    <button type="button" className="btn btn-primary"
+                    <button type="button" className="btn btn-primary" aria-label="view guide detail"
                       onClick={() => { navigate(`/guide/detail/${guide.id}`);}}>
                       Details
                     </button>

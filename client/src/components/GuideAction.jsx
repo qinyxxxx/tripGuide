@@ -111,7 +111,9 @@ const GuideAction = () => {
           <div className="col-md-8">
             <div className="card shadow">
               <div className="card-body">
-                <button onClick={() => window.history.back()} className="btn float-start"><i className="bi bi-arrow-left"></i></button>
+                <button onClick={() => window.history.back()} className="btn float-start" aria-label="go back">
+                  <i className="bi bi-arrow-left"></i>
+                  </button>
                 {action === "create" ? (
                   <h3 className="card-title text-center mb-4">Create Post</h3>
                 ) : (
@@ -233,7 +235,7 @@ const GuideAction = () => {
                     </label>
                   </div>
                   <div className="text-center">
-                    <button type="submit" className="btn btn-primary">Submit</button>
+                    <button type="submit" className="btn btn-primary" aria-label="submit">Submit</button>
                   </div>
                 </form>
               </div>
