@@ -16,6 +16,7 @@ import AuthDebugger from "./components/AuthDebugger";
 import GuideDetail from "./components/GuideDetail";
 import Profile from "./components/Profile";
 import MyTripGuide from "./components/MyTripGuides"
+import UserInfo from "./components/UserInfo";
 
 
 const container = document.getElementById("root");
@@ -41,6 +42,7 @@ root.render(
             <Route path="/login" element={<Login />} />
             <Route path="/verify-user" element={<VerifyUser />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/user/:id" element={<UserInfo />} />
             <Route path="/my-tripguides" element={<MyTripGuide />} />
             <Route path="/guide/detail/:id" element={<GuideDetail />} />
             <Route path="/guide/create" element={<GuideAction action="create" />} />

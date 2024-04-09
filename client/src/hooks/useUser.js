@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuthToken } from "../AuthTokenContext";
 
 
@@ -59,7 +59,24 @@ const useUser = () => {
     }
   };
 
-  return { user, isLoading, updateUserProfile };
+  const getUserById = useCallback(async (userId) => {
+    if (!userId) {
+      return;
+    }
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/user/${userId}`);
+      if (!response.ok) {
+        throw new Error('Failed to get user');
+      }
+      const user = await response.json();
+      return user;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }, []);
+
+  return { user, isLoading, updateUserProfile, getUserById };
 }
 
 

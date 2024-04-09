@@ -40,9 +40,9 @@ const Home = () => {
           <Link to="/guide/create" className="btn btn-primary" aria-label="Create a new guide">
             Create New Guide
           </Link>
-          <Link to="/debugger" className="btn btn-primary"  aria-label="Debugger Page">
+          {/* <Link to="/debugger" className="btn btn-primary"  aria-label="Debugger Page">
             Debugger
-          </Link>
+          </Link> */}
         </div>
       </div>
       <div className="container mt-4">
@@ -83,10 +83,16 @@ const Home = () => {
                   </p>
                   <div className="d-flex justify-content-between align-items-center">
                     <small className="text-muted">
-                      Posted by {guide.guser.name} on {" "} {formattedDate(guide.createdAt)}
+                      Posted by {" "}
+                      <a href={`/user/${guide.guser.id}`}
+                        target="_self"
+                        rel="noopener noreferrer"
+                        className="custom-link-color">
+                        {guide.guser.name}
+                      </a> on {" "} {formattedDate(guide.createdAt)}
                     </small>
                     <button type="button" className="btn btn-primary" aria-label="view guide detail"
-                      onClick={() => { navigate(`/guide/detail/${guide.id}`);}}>
+                      onClick={() => { navigate(`/guide/detail/${guide.id}`); }}>
                       Details
                     </button>
                   </div>
@@ -100,7 +106,12 @@ const Home = () => {
                             {truncateContent(comment.content, 30)}
                           </div>
                           <div className="text-end">
-                            <span>{comment.cuser.name}</span>
+                            <a href={`/user/${comment.cuser.id}`}
+                              target="_self"
+                              rel="noopener noreferrer"
+                              className="custom-link-color">
+                              {comment.cuser.name}
+                            </a>
                             <small className="text-muted ms-2">
                               {formattedDate(comment.createdAt)}
                             </small>

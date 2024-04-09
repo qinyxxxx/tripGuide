@@ -30,6 +30,11 @@ body {
   text-decoration: underline;
 }
 
+.custom-link-color {
+  color: #686262;
+  text-decoration: underline;
+}
+
 @media (max-width: 768px) {
   .greeting {
     display: none;

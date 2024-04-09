@@ -97,7 +97,13 @@ const GuideDetail = () => {
             </p>
             <div className="d-flex justify-content-end">
               <small>
-                Posted by {guide.guser.name} on {formattedDate(guide.createdAt)}
+                Posted by{" "}
+                <a href={`/user/${guide.guser.id}`}
+                  target="_self"
+                  rel="noopener noreferrer"
+                  className="custom-link-color">
+                  {guide.guser.name}
+                </a> on {formattedDate(guide.createdAt)}
               </small>
             </div>
             <hr />
@@ -108,7 +114,13 @@ const GuideDetail = () => {
                   <li key={comment.id}>
                     <div>{comment.content}</div>
                     <div className="text-end">
-                      <span>{comment.cuser.name}</span>
+                      <a href={`/user/${comment.cuser.id}`}
+                        target="_self"
+                        rel="noopener noreferrer"
+                        className="custom-link-color">
+                        {comment.cuser.name}
+                      </a>
+                      {/* <span>{comment.cuser.name}</span> */}
                       <small className="text-muted ms-2">
                         {formattedDate(comment.createdAt)}
                       </small>
