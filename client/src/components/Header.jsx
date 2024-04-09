@@ -7,13 +7,14 @@ const Header = () => {
   return (
     <Navbar bg="white" expand="md" className="sticky-top py-3 shadow">
       <Container className="d-flex justify-content-center align-items-center">
-        <Navbar.Brand href="/">Trip Guide</Navbar.Brand>
+        <Navbar.Brand href="/">Trip Guides</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
             <NavLink to="/" className={({ isActive }) => isActive ? "btn text-dark active-link" : "btn text-dark"}>Home</NavLink>
             <NavLink to="/my-tripguides" className={({ isActive }) => isActive ? "btn text-dark active-link" : "btn text-dark"}>My Posts</NavLink>
             <NavLink to="/profile" className={({ isActive }) => isActive ? "btn text-dark active-link" : "btn text-dark"}>My Profile</NavLink>
+            <NavLink to="/about" className={({ isActive }) => isActive ? "btn text-dark active-link" : "btn text-dark"}>About</NavLink>
           </Nav>
           {user ? (
             <>

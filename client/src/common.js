@@ -14,3 +14,5 @@ const truncateContent = (content, maxLength) => {
   }
   return content;
 };
+
+export { formattedDate, truncateContent };

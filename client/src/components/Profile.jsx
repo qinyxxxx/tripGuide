@@ -14,9 +14,6 @@ const Profile = () => {
   });
 
   useEffect(() => {
-    console.log('useEffect ran');
-    console.log('user:', user);
-    console.log("isLoading:", isLoading);
     if (!isLoading) {
       if (user) {
         setFormData({

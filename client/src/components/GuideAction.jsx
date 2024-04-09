@@ -45,13 +45,6 @@ const GuideAction = () => {
     }
   }, [singleGuide, action, getCities]);
 
-  // useEffect(() => {
-  //   if (formData.country && action !== 'edit') {
-  //     getCities(formData.country).then(setCities);
-  //   }
-  // }, [formData.country, action]);
-  
-
   const handleChange = (e) => {
     const { name, value, checked } = e.target;
     if (name === 'isPrivate') {
