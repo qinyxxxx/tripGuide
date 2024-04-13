@@ -106,7 +106,7 @@ const GuideAction = () => {
               <div className="card-body">
                 <button onClick={() => window.history.back()} className="btn float-start" aria-label="go back">
                   <i className="bi bi-arrow-left"></i>
-                  </button>
+                </button>
                 {action === "create" ? (
                   <h3 className="card-title text-center mb-4">Create Post</h3>
                 ) : (
@@ -186,7 +186,9 @@ const GuideAction = () => {
                       >
                         <option value="">Select Rating</option>
                         {[1, 2, 3, 4, 5].map((value) => (
-                          <option key={value} value={value}>{value}</option>
+                          <option key={value} value={value}>
+                            {`${'\u2605'.repeat(value)}${'\u2606'.repeat(5 - value)}`}
+                          </option>
                         ))}
                       </select>
                     </div>

@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import useTripGuides from "../hooks/useTripGuides";
 import DeleteModal from "./DeleteModal";
-import { formattedDate, truncateContent } from "../common";
+import { formattedDate, truncateContent, renderRatingStars } from "../common";
 
 const MyTripGuides = () => {
   const { myGuides, deleteTripGuide } = useTripGuides();
@@ -92,7 +92,7 @@ const MyTripGuides = () => {
                     {truncateContent(guide.content, 200)}
                   </p>
                   <p className="card-text">
-                    <strong>Rating:</strong> {guide.rating}
+                    <strong>Rating:</strong> {renderRatingStars(guide.rating)}
                   </p>
                   <div className="d-flex justify-content-between align-items-center">
                     <small className="text-muted">
@@ -111,7 +111,7 @@ const MyTripGuides = () => {
                   </div>
                   <hr />
                   <div>
-                    <h6>Comments({guide.comment.length}): </h6>
+                    <p className="text-sm">Comments({guide.comment.length}): </p>
                     <ul>
                       {guide.comment.slice(0, 3).map((comment) => (
                         <li key={comment.id} className="d-flex justify-content-between align-items-center">

@@ -15,4 +15,18 @@ const truncateContent = (content, maxLength) => {
   return content;
 };
 
-export { formattedDate, truncateContent };
+const renderRatingStars = (rating) => {
+  const maxRating = 5;
+
+  const stars = [];
+  for (let i = 0; i < rating; i++) {
+    stars.push(<span key={`full-${i}`}>&#9733;</span>);
+  }
+  for (let i = rating; i < maxRating; i++) {
+    stars.push(<span key={`empty-${i}`}>&#9734;</span>);
+  }
+
+  return stars;
+};
+
+export { formattedDate, truncateContent, renderRatingStars };

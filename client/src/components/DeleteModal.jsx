@@ -8,6 +8,7 @@ const DeleteModal = ({ show, onHide, onDelete, content }) => {
       show={show}
       onHide={onHide}
       dialogClassName="modal-dialog-centered"
+      aria-label="Delete Confirmation Modal"
     >
       <Modal.Header closeButton>
         <Modal.Title>{"Confirm Delete"}</Modal.Title>

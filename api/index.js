@@ -65,8 +65,8 @@ async function validateTripGuideData(req, res) {
       return res.status(400).json({ error: `${field} is required` });
     }
   }
-  if (typeof data.title !== "string" || data.title.length > 30) {
-    return res.status(400).json({ error: "Title must be a string with max length of 30 characters" });
+  if (typeof data.title !== "string" || data.title.length > 50) {
+    return res.status(400).json({ error: "Title must be a string with max length of 50 characters" });
   }
   if (typeof data.rating !== "number" || data.rating < 1 || data.rating > 5) {
     return res.status(400).json({ error: "Rating must be a number between 1 and 5" });

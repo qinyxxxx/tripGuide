@@ -85,8 +85,8 @@ const useTripGuides = () => {
         break;
       }
     }
-    if (typeof guideData.title !== "string" || guideData.title.length > 30) {
-      errorMessage = "Title must be a string with max length of 30 characters";
+    if (typeof guideData.title !== "string" || guideData.title.length > 50) {
+      errorMessage = "Title must be a string with max length of 50 characters";
     }
     if (typeof guideData.rating !== "number" || guideData.rating < 1 || guideData.rating > 5) {
       errorMessage = "Rating must be a number between 1 and 5";

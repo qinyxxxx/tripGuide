@@ -5,7 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import useTripGuides from "../hooks/useTripGuides";
 import useComments from "../hooks/useComments";
 import DeleteModal from "./DeleteModal";
-import { formattedDate } from "../common";
+import { formattedDate, renderRatingStars } from "../common";
 
 
 const GuideDetail = () => {
@@ -84,7 +84,7 @@ const GuideDetail = () => {
               <strong>City:</strong> {guide.city}
             </p>
             <p className="card-text">
-              <strong>Rating:</strong> {guide.rating}
+              <strong>Rating:</strong> {renderRatingStars(guide.rating)}
             </p>
             <p className="card-text">
               <strong>Cost:</strong> ${guide.cost}
@@ -108,7 +108,7 @@ const GuideDetail = () => {
             </div>
             <hr />
             <div>
-              <h6>Comments({comments.length}):</h6>
+              <p className="text-sm">Comments ({comments.length}):</p>
               <ul>
                 {comments.map((comment) => (
                   <li key={comment.id}>
