@@ -5,12 +5,14 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider     = "postgresql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 model User {
@@ -35,8 +37,8 @@ model TripGuide {
   isPrivate Boolean   @default(false)
   country   String    @db.VarChar(255)
   city      String?   @db.VarChar(255)
-  duration  Int?      @default(-1) @db.Int
-  rating    Int       @db.Int
+  duration  Int?      @default(-1) @db.Integer
+  rating    Int       @db.Integer
   cost      Float?    @default(-1)
   content   String    @db.Text
   comment   Comment[]
