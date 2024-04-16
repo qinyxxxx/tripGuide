@@ -99,7 +99,7 @@ const Home = () => {
                   <hr />
                   <div>
                     <p className="text-sm">Comments({guide.comment.length}): </p>
-                    <ul>
+                    <ul style={{ listStyle: 'none', padding: 0 }}>
                       {guide.comment.slice(0, 3).map((comment) => (
                         <li key={comment.id} className="d-flex justify-content-between align-items-center">
                           <div>

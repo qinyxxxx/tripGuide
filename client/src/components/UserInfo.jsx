@@ -21,7 +21,7 @@ const UserInfo = () => {
   if (!user) {
     return <div>User not found.</div>;
   }
-  
+
   return (
     <div>
       <Header />
@@ -30,6 +30,9 @@ const UserInfo = () => {
           <div className="col-md-6">
             <div className="card shadow">
               <div className="card-body">
+                <button onClick={() => window.history.back()} className="btn float-start" aria-label="go back">
+                  <i className="bi bi-arrow-left"></i>
+                </button>
                 <h3 className="card-title text-center mb-4">User Info</h3>
                 <div className="mb-3">
                   <strong>Name:</strong> {user.name}
