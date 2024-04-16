@@ -116,6 +116,9 @@ app.get("/tripguides/:id", async (req, res) => {
         include: {
           cuser: true, // Include the user related to each comment
         },
+        orderBy: {
+          createdAt: 'desc',
+        },
       },
       guser: true
     },
